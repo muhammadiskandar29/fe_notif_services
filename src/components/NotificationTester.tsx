@@ -126,6 +126,8 @@ export const NotificationTester: React.FC = () => {
         <p className="text-xs text-slate-400 mt-1">
           Uji coba pengiriman payload notifikasi ke In-App Database Inbox dan FCM Push menggunakan route database
         </p>
+      </div>
+
       {/* Live Token Sync Banner */}
       <div className="bg-gradient-to-r from-indigo-950/70 via-purple-950/50 to-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-start gap-3.5">
