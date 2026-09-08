@@ -1,11 +1,17 @@
 import axios from 'axios';
 import { ApiResponse, NotificationRoute, PushNotificationRequest } from '../types';
 
-const getBaseUrl = () => {
+export const DEFAULT_API_BASE_URL = 
+  import.meta.env.VITE_API_BASE_URL || 
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+    ? 'http://localhost/rs_keuanganGL_V2/api/hr' 
+    : 'https://daytrack.apbagroup.com/api/hr');
+
+export const getBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('API_BASE_URL') || 'http://localhost/rs_keuanganGL_V2/api/hr';
+    return localStorage.getItem('API_BASE_URL') || DEFAULT_API_BASE_URL;
   }
-  return 'http://localhost/rs_keuanganGL_V2/api/hr';
+  return DEFAULT_API_BASE_URL;
 };
 
 const getAuthToken = () => {

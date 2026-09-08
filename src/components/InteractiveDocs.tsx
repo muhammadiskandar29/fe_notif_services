@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Copy, Check, Code2, Sparkles, Layers } from 'lucide-react';
+import { Copy, Check, Code2, Sparkles, Layers, Send, Network } from 'lucide-react';
 
-export const InteractiveDocs: React.FC = () => {
+interface InteractiveDocsProps {
+  apiBaseUrl?: string;
+}
+
+export const InteractiveDocs: React.FC<InteractiveDocsProps> = ({ apiBaseUrl = 'https://daytrack.apbagroup.com/api/hr' }) => {
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<'laravel' | 'curl' | 'javascript' | 'python'>('laravel');
 
@@ -40,8 +44,8 @@ public function approveApplicant(Request $request, $id)
 
     return response()->json(['message' => 'Approved & Notification Sent!']);
 }`,
-    curl: `# 🌐 Contoh HTTP REST API (cURL) dari Website / Sistem Apapun
-curl -X POST "http://localhost/rs_keuanganGL_V2/api/hr/notification/push" \\
+    curl: `# 🌐 1. Contoh Push Notifikasi (cURL REST API)
+curl -X POST "${apiBaseUrl}/notification/push" \\
   -H "Content-Type: application/json" \\
   -H "Accept: application/json" \\
   -d '{
@@ -56,12 +60,26 @@ curl -X POST "http://localhost/rs_keuanganGL_V2/api/hr/notification/push" \\
       "code": "APP-2026-001"
     },
     "channels": ["database", "fcm"]
+  }'
+
+# 🌐 2. Contoh Mendaftarkan Route Baru via API (Gerbang Input Route)
+curl -X POST "${apiBaseUrl}/notification_route/store" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "event_code": "leave_request_submitted",
+    "description": "Notifikasi Pengajuan Cuti Baru",
+    "web_target": "https://daytrack.apbagroup.com/hrm/leave-approval/{id}/detail",
+    "mobile_target": "app://leave/detail/{id}",
+    "target_roles_id": [1, 51]
   }'`,
-    javascript: `// ⚡ Contoh di JavaScript / TypeScript (Node.js / React / Vue)
+    javascript: `// ⚡ Contoh di JavaScript / TypeScript (Node.js / React / Vue / Next.js)
 import axios from 'axios';
 
+const API_BASE = '${apiBaseUrl}';
+
+// 1. Kirim Notifikasi
 async function triggerNotification() {
-  const response = await axios.post('http://localhost/rs_keuanganGL_V2/api/hr/notification/push', {
+  const response = await axios.post(\`\${API_BASE}/notification/push\`, {
     event_code: 'approval_applicant',
     user_id: 152,
     title: 'Pelamar Baru Membutuhkan Review',
@@ -76,11 +94,25 @@ async function triggerNotification() {
   });
 
   console.log('Notif Response:', response.data);
+}
+
+// 2. Daftarkan Route Baru secara Programmatic (Gerbang Input Route)
+async function registerRoute() {
+  const response = await axios.post(\`\${API_BASE}/notification_route/store\`, {
+    event_code: 'payroll_published',
+    description: 'Notifikasi Slip Gaji Diterbitkan',
+    web_target: 'https://daytrack.apbagroup.com/hrm/payroll/{id}/view',
+    mobile_target: 'app://payroll/{id}',
+    target_roles_id: [1, 10, 51]
+  });
+  console.log('Route Registered:', response.data);
 }`,
-    python: `# 🐍 Contoh di Python (Django / Flask / FastApi / Scripts)
+    python: `# 🐍 Contoh di Python (Django / Flask / FastAPI / Microservices)
 import requests
 
-url = "http://localhost/rs_keuanganGL_V2/api/hr/notification/push"
+API_BASE = "${apiBaseUrl}"
+
+# 1. Dispatch Push Notification
 payload = {
     "event_code": "approval_applicant",
     "user_id": 152,
@@ -95,8 +127,19 @@ payload = {
     "channels": ["database", "fcm"]
 }
 
-response = requests.post(url, json=payload)
-print(response.json())`
+response = requests.post(f"{API_BASE}/notification/push", json=payload)
+print("Notif Status:", response.json())
+
+# 2. Daftarkan Route Baru (Gerbang Input Route)
+route_data = {
+    "event_code": "finance_invoice_approved",
+    "description": "Notifikasi Invoice Finance Telah Disetujui",
+    "web_target": "https://daytrack.apbagroup.com/finance/invoice/{id}",
+    "mobile_target": "app://invoice/{id}",
+    "target_roles_id": [1, 20]
+}
+route_res = requests.post(f"{API_BASE}/notification_route/store", json=route_data)
+print("Route Saved:", route_res.json())`
   };
 
   return (
@@ -107,14 +150,19 @@ print(response.json())`
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" />
-            Developer Integration Guide
+            Universal Developer Integration Guide
           </div>
           <h1 className="text-3xl font-extrabold text-white sm:text-4xl tracking-tight">
-            Centralized Notification Service
+            Centralized Universal Notification Hub
           </h1>
           <p className="mt-3 text-slate-300 text-base leading-relaxed">
-            Satu sistem notifikasi terpusat untuk semua website, aplikasi mobile, dan microservice. Daftarkan URL rute Anda di <span className="text-indigo-400 font-semibold">Route Registry</span>, lalu tembak notifikasi dengan satu baris fungsi!
+            Gerbang notifikasi terpusat untuk seluruh web app, mobile app, microservice, dan backend. Kelola pemetaan route via UI <span className="text-indigo-400 font-semibold">Route Registry</span> atau REST API Gateway, lalu dispatch notifikasi kapan saja.
           </p>
+          <div className="mt-4 flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 w-fit">
+            <Network className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Active API Gateway Base:</span>
+            <span className="text-emerald-300 font-semibold">{apiBaseUrl}</span>
+          </div>
         </div>
       </div>
 
@@ -124,9 +172,9 @@ print(response.json())`
           <div className="w-10 h-10 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold text-lg mb-4 border border-indigo-500/30">
             1
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Daftarkan Event Route</h3>
+          <h3 className="text-lg font-bold text-white mb-2">1. Input & Daftarkan Route</h3>
           <p className="text-sm text-slate-400 leading-relaxed">
-            Daftarkan <code className="text-indigo-300 bg-slate-950 px-1 py-0.5 rounded">event_code</code> unik beserta target URL tujuan untuk Website dan Mobile App.
+            Daftarkan <code className="text-indigo-300 bg-slate-950 px-1 py-0.5 rounded">event_code</code> unik beserta target URL tujuan via tab <strong>Route Registry</strong> atau via REST API <code className="text-indigo-300 bg-slate-950 px-1 py-0.5 rounded">POST /notification_route/store</code>.
           </p>
         </div>
 
@@ -134,9 +182,9 @@ print(response.json())`
           <div className="w-10 h-10 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-lg mb-4 border border-purple-500/30">
             2
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Gunakan Placeholder Dinamis</h3>
+          <h3 className="text-lg font-bold text-white mb-2">2. Placeholder Dinamis</h3>
           <p className="text-sm text-slate-400 leading-relaxed">
-            Gunakan placeholder seperti <code className="text-purple-300 bg-slate-950 px-1 py-0.5 rounded">&#123;id&#125;</code> atau <code className="text-purple-300 bg-slate-950 px-1 py-0.5 rounded">&#123;code&#125;</code> pada URL. Sistem akan otomatis mereplace nilainya saat event dikirim.
+            Gunakan placeholder seperti <code className="text-purple-300 bg-slate-950 px-1 py-0.5 rounded">&#123;id&#125;</code> atau <code className="text-purple-300 bg-slate-950 px-1 py-0.5 rounded">&#123;code&#125;</code> pada URL target. Sistem otomatis mereplace nilainya saat event dikirim.
           </p>
         </div>
 
@@ -144,10 +192,65 @@ print(response.json())`
           <div className="w-10 h-10 rounded-lg bg-pink-600/20 text-pink-400 flex items-center justify-center font-bold text-lg mb-4 border border-pink-500/30">
             3
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Tembak Notifikasi (Push)</h3>
+          <h3 className="text-lg font-bold text-white mb-2">3. Tembak Notifikasi (Push)</h3>
           <p className="text-sm text-slate-400 leading-relaxed">
             Panggil API / Controller dari project manapun. Notifikasi langsung disimpan di database inbox dan dikirimkan via Firebase Cloud Messaging (FCM).
           </p>
+        </div>
+      </div>
+
+      {/* API Gateway Endpoints Directory */}
+      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <Network className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Gerbang REST API (Gateway Endpoints)</h2>
+            <p className="text-xs text-slate-400">Endpoint HTTP yang tersedia untuk integrasi antar service & website</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded font-mono font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">POST</span>
+              <code className="text-slate-200 font-mono font-semibold">{apiBaseUrl}/notification_route/store</code>
+            </div>
+            <p className="text-slate-400">
+              <strong>Gerbang Input Route:</strong> Mendaftarkan route baru atau mengupdate route yang sudah ada ke database.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded font-mono font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">POST</span>
+              <code className="text-slate-200 font-mono font-semibold">{apiBaseUrl}/notification_route/list</code>
+            </div>
+            <p className="text-slate-400">
+              <strong>List Routes:</strong> Mengambil seluruh data route notifikasi yang terdaftar di database.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">POST</span>
+              <code className="text-slate-200 font-mono font-semibold">{apiBaseUrl}/notification/push</code>
+            </div>
+            <p className="text-slate-400">
+              <strong>Push Dispatcher:</strong> Mengirimkan payload notifikasi ke In-App Inbox dan Firebase FCM.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">POST</span>
+              <code className="text-slate-200 font-mono font-semibold">{apiBaseUrl}/notification_route/delete</code>
+            </div>
+            <p className="text-slate-400">
+              <strong>Delete Route:</strong> Menghapus route berdasarkan <code>event_code</code>.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -159,7 +262,7 @@ print(response.json())`
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Kamus Field Database (hr_notification_routes)</h2>
-            <p className="text-xs text-slate-400">Penjelasan detail setiap kolom yang wajib/opsional didaftarkan</p>
+            <p className="text-xs text-slate-400">Penjelasan detail setiap kolom saat mendaftarkan route notifikasi</p>
           </div>
         </div>
 
@@ -187,7 +290,7 @@ print(response.json())`
                 <td className="py-3 px-4 font-mono text-slate-400">VARCHAR(255)</td>
                 <td className="py-3 px-4"><span className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 font-semibold text-[10px]">Opsional</span></td>
                 <td className="py-3 px-4 text-slate-300">
-                  Keterangan manusiawi mengenai fungsi rute notifikasi ini untuk dokumentasi admin/developer.
+                  Keterangan mengenai fungsi rute notifikasi ini untuk dokumentasi admin/developer.
                 </td>
               </tr>
               <tr className="hover:bg-slate-800/30 transition-colors">
@@ -195,7 +298,7 @@ print(response.json())`
                 <td className="py-3 px-4 font-mono text-slate-400">VARCHAR(255)</td>
                 <td className="py-3 px-4"><span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold text-[10px]">Disarankan</span></td>
                 <td className="py-3 px-4 text-slate-300">
-                  URL tujuan ketika notifikasi diklik pada web frontend. Mendukung placeholder dinamis seperti <code className="text-emerald-300 font-mono">&#123;id&#125;</code>.
+                  URL tujuan ketika notifikasi diklik pada web frontend. Mendukung placeholder dinamis seperti <code className="text-emerald-300 font-mono">&#123;id&#125;</code> atau <code className="text-emerald-300 font-mono">&#123;code&#125;</code>.
                   <div className="mt-1 text-slate-400 font-mono text-[11px]">Contoh: https://daytrack.apbagroup.com/hrm/approval-center/applicant-approval/&#123;id&#125;/process</div>
                 </td>
               </tr>
@@ -213,7 +316,7 @@ print(response.json())`
                 <td className="py-3 px-4 font-mono text-slate-400">TEXT (JSON Array)</td>
                 <td className="py-3 px-4"><span className="px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 font-semibold text-[10px]">Opsional</span></td>
                 <td className="py-3 px-4 text-slate-300">
-                  ID Role pengguna yang berhak menerima notifikasi ini dalam bentuk JSON Array. Contoh: <code className="bg-slate-950 px-1 py-0.5 rounded text-amber-300 font-mono">[1, 51]</code> (1 = Superadmin, 51 = HRD Manager). Jika <code className="text-slate-400">NULL</code>, maka terbuka untuk semua target user yang dikirimkan.
+                  ID Role pengguna yang berhak menerima notifikasi ini dalam bentuk JSON Array. Contoh: <code className="bg-slate-950 px-1 py-0.5 rounded text-amber-300 font-mono">[1, 51]</code> (1 = Superadmin, 51 = HRD Manager). Jika <code className="text-slate-400">NULL</code>, maka terbuka untuk semua target user.
                 </td>
               </tr>
             </tbody>
@@ -229,8 +332,8 @@ print(response.json())`
               <Code2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Tata Cara Pemanggilan di Project Lain</h2>
-              <p className="text-xs text-slate-400">Pilih bahasa / platform untuk melihat contoh implementasi kode</p>
+              <h2 className="text-lg font-bold text-white">Tata Cara Pemanggilan & Integrasi Code</h2>
+              <p className="text-xs text-slate-400">Pilih bahasa / platform untuk melihat contoh implementasi</p>
             </div>
           </div>
 

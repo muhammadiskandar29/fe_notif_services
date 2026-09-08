@@ -4,7 +4,11 @@ import { PushNotificationRequest, NotificationRoute } from '../types';
 import { sendPushNotification, fetchNotificationRoutes, registerFCMDeviceToken } from '../services/api';
 import { requestForToken, onMessageListener } from '../firebase';
 
-export const NotificationTester: React.FC = () => {
+interface NotificationTesterProps {
+  apiBaseUrl?: string;
+}
+
+export const NotificationTester: React.FC<NotificationTesterProps> = ({ apiBaseUrl = 'https://daytrack.apbagroup.com/api/hr' }) => {
   const [routes, setRoutes] = useState<NotificationRoute[]>([]);
   const [activeToken, setActiveToken] = useState<string | null>(null);
   const [syncingToken, setSyncingToken] = useState(false);
@@ -343,7 +347,7 @@ export const NotificationTester: React.FC = () => {
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500">
-            * Endpoint Dispatcher: <code className="text-slate-400 font-mono">POST /api/hr/notification/push</code>
+            * Endpoint Dispatcher: <code className="text-indigo-400 font-mono">POST {apiBaseUrl}/notification/push</code>
           </div>
         </div>
       </div>

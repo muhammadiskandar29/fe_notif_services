@@ -5,14 +5,13 @@ import { RouteRegistry } from './components/RouteRegistry';
 import { NotificationTester } from './components/NotificationTester';
 import { LiveInbox } from './components/LiveInbox';
 import { requestForToken, onMessageListener } from './firebase';
+import { getBaseUrl } from './services/api';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'docs' | 'routes' | 'tester' | 'inbox'>('docs');
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [liveFCMMessage, setLiveFCMMessage] = useState<any>(null);
-  const [apiBaseUrl, setApiBaseUrl] = useState<string>(
-    localStorage.getItem('API_BASE_URL') || 'http://localhost/rs_keuanganGL_V2/api/hr'
-  );
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>(getBaseUrl());
   const [apiToken, setApiToken] = useState<string>(
     localStorage.getItem('API_AUTH_TOKEN') || ''
   );
@@ -66,9 +65,9 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'docs' && <InteractiveDocs />}
+        {activeTab === 'docs' && <InteractiveDocs apiBaseUrl={apiBaseUrl} />}
         {activeTab === 'routes' && <RouteRegistry />}
-        {activeTab === 'tester' && <NotificationTester />}
+        {activeTab === 'tester' && <NotificationTester apiBaseUrl={apiBaseUrl} />}
         {activeTab === 'inbox' && (
           <LiveInbox
             fcmToken={fcmToken}

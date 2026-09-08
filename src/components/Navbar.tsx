@@ -144,36 +144,72 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* API Config Modal Drawer */}
       {showSettings && (
         <div className="border-t border-slate-800 bg-slate-900/95 px-4 py-4 animate-in slide-in-from-top duration-200">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-4 justify-between">
-            <div className="w-full md:w-1/2">
-              <label className="block text-xs font-medium text-slate-400 mb-1">
-                Backend API Base URL
-              </label>
-              <input
-                type="text"
-                value={apiBaseUrl}
-                onChange={(e) => {
-                  setApiBaseUrl(e.target.value);
-                  localStorage.setItem('API_BASE_URL', e.target.value);
-                }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"
-                placeholder="http://localhost/rs_keuanganGL_V2/api/hr"
-              />
-            </div>
-            <div className="w-full md:w-1/2">
-              <label className="block text-xs font-medium text-slate-400 mb-1">
-                Bearer Auth Token (Opsional untuk testing user)
-              </label>
-              <input
-                type="text"
-                value={apiToken}
-                onChange={(e) => {
-                  setApiToken(e.target.value);
-                  localStorage.setItem('API_AUTH_TOKEN', e.target.value);
-                }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              />
+          <div className="max-w-7xl mx-auto space-y-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="w-full md:w-1/2">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-slate-300">
+                    Backend API Gateway URL (Global/Dinamis)
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const url = 'https://daytrack.apbagroup.com/api/hr';
+                        setApiBaseUrl(url);
+                        localStorage.setItem('API_BASE_URL', url);
+                      }}
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-all ${
+                        apiBaseUrl.includes('daytrack.apbagroup.com')
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                      }`}
+                    >
+                      🌐 Production Hub
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const url = 'http://localhost/rs_keuanganGL_V2/api/hr';
+                        setApiBaseUrl(url);
+                        localStorage.setItem('API_BASE_URL', url);
+                      }}
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-all ${
+                        apiBaseUrl.includes('localhost')
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+                      }`}
+                    >
+                      💻 Local Dev
+                    </button>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  value={apiBaseUrl}
+                  onChange={(e) => {
+                    setApiBaseUrl(e.target.value);
+                    localStorage.setItem('API_BASE_URL', e.target.value);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-emerald-400 focus:outline-none focus:border-indigo-500"
+                  placeholder="https://daytrack.apbagroup.com/api/hr"
+                />
+              </div>
+              <div className="w-full md:w-1/2">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Bearer Auth Token (Opsional untuk testing authenticated user)
+                </label>
+                <input
+                  type="text"
+                  value={apiToken}
+                  onChange={(e) => {
+                    setApiToken(e.target.value);
+                    localStorage.setItem('API_AUTH_TOKEN', e.target.value);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"
+                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                />
+              </div>
             </div>
           </div>
         </div>
