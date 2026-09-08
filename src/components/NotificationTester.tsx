@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Terminal, Radio, Bell, CheckCircle2, RefreshCw, Smartphone } from 'lucide-react';
+import { Send, Terminal, Radio, CheckCircle2, RefreshCw, Smartphone } from 'lucide-react';
 import { PushNotificationRequest, NotificationRoute } from '../types';
 import { sendPushNotification, fetchNotificationRoutes, registerFCMDeviceToken } from '../services/api';
 import { requestForToken, onMessageListener } from '../firebase';
@@ -9,7 +9,6 @@ export const NotificationTester: React.FC = () => {
   const [activeToken, setActiveToken] = useState<string | null>(null);
   const [syncingToken, setSyncingToken] = useState(false);
   const [tokenSyncMessage, setTokenSyncMessage] = useState<string | null>(null);
-  const [liveNotification, setLiveNotification] = useState<any | null>(null);
 
   const [formData, setFormData] = useState<PushNotificationRequest>({
     event_code: '',
@@ -49,7 +48,6 @@ export const NotificationTester: React.FC = () => {
     // Listen to real-time foreground pushes
     onMessageListener()
       .then((payload: any) => {
-        setLiveNotification(payload);
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification(payload?.notification?.title || 'Notifikasi Baru', {
             body: payload?.notification?.body || '',
